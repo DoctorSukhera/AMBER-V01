@@ -928,361 +928,370 @@ elif page == "DNA Compass / Method":
 
 elif page == "Model & Validation":
     def _render_validation_html(raw_html):
-        # Prevent Markdown from interpreting indented HTML as code blocks.
-        normalized = []
-        for line in raw_html.splitlines():
-            normalized.append(line[4:] if line.startswith("    ") else line)
-        st.markdown("\n".join(normalized), unsafe_allow_html=True)
+        """Render Page-4 HTML as a single compact HTML stream.
+
+        Streamlit's Markdown parser can treat any remaining indentation after
+        blank lines as fenced/code content. Page 4 contains nested HTML/SVG,
+        so removing only the first four spaces is not sufficient. Fully
+        left-strip each markup line and concatenate the lines so Markdown
+        cannot split the unified cards into code blocks or separate DOM trees.
+        """
+        compact_html = "".join(
+            line.lstrip()
+            for line in raw_html.splitlines()
+            if line.strip()
+        )
+        st.markdown(compact_html, unsafe_allow_html=True)
 
     st.markdown("""
-    <style>
-    /* ==========================================================
-       PAGE 4 — MODEL & VALIDATION LOCKED VISUAL MATCH
-       Scoped to this page. Shared hero/nav remain untouched.
-       ========================================================== */
-    .validation-title-row{
-        display:grid;
-        grid-template-columns:minmax(0,1fr) 510px;
-        align-items:center;
-        column-gap:30px;
-        min-height:104px;
-        margin:0 0 12px 0;
-    }
-    .validation-title-left{align-self:center;}
-    .validation-kicker{
-        color:#0B4EA1;
-        font-size:12px;
-        line-height:1;
-        font-weight:850;
-        text-transform:uppercase;
-        letter-spacing:1.5px;
-        margin:0 0 11px 0;
-    }
-    .validation-title{
-        color:#06285F;
-        font-size:37px;
-        line-height:1.05;
-        font-weight:850;
-        letter-spacing:-.8px;
-        margin:0 0 7px 0;
-    }
-    .validation-sub{
-        color:#617892;
-        font-size:16px;
-        line-height:1.3;
-        margin:0;
-    }
-    .validation-brand-message{text-align:right;align-self:center;padding-top:7px;}
-    .validation-brand-main{
-        color:#0B4EA1;
-        font-size:13px;
-        letter-spacing:5px;
-        font-weight:500;
-        white-space:nowrap;
-    }
-    .validation-brand-sub{
-        color:#5D79A3;
-        font-size:10.5px;
-        letter-spacing:1.4px;
-        margin-top:25px;
-        white-space:nowrap;
-    }
-    .validation-brand-ai{
-        position:relative;
-        display:inline-block;
-        padding:0 6px;
-    }
-    .validation-brand-ai:after{
-        content:"";
-        position:absolute;
-        left:3px;
-        right:3px;
-        bottom:-13px;
-        height:2px;
-        background:#F4B42D;
-    }
+<style>
+/* ==========================================================
+   PAGE 4 — MODEL & VALIDATION LOCKED VISUAL MATCH
+   Scoped to this page. Shared hero/nav remain untouched.
+   ========================================================== */
+.validation-title-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 510px;
+    align-items:center;
+    column-gap:30px;
+    min-height:104px;
+    margin:0 0 12px 0;
+}
+.validation-title-left{align-self:center;}
+.validation-kicker{
+    color:#0B4EA1;
+    font-size:12px;
+    line-height:1;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    margin:0 0 11px 0;
+}
+.validation-title{
+    color:#06285F;
+    font-size:37px;
+    line-height:1.05;
+    font-weight:850;
+    letter-spacing:-.8px;
+    margin:0 0 7px 0;
+}
+.validation-sub{
+    color:#617892;
+    font-size:16px;
+    line-height:1.3;
+    margin:0;
+}
+.validation-brand-message{text-align:right;align-self:center;padding-top:7px;}
+.validation-brand-main{
+    color:#0B4EA1;
+    font-size:13px;
+    letter-spacing:5px;
+    font-weight:500;
+    white-space:nowrap;
+}
+.validation-brand-sub{
+    color:#5D79A3;
+    font-size:10.5px;
+    letter-spacing:1.4px;
+    margin-top:25px;
+    white-space:nowrap;
+}
+.validation-brand-ai{
+    position:relative;
+    display:inline-block;
+    padding:0 6px;
+}
+.validation-brand-ai:after{
+    content:"";
+    position:absolute;
+    left:3px;
+    right:3px;
+    bottom:-13px;
+    height:2px;
+    background:#F4B42D;
+}
 
-    .validation-notice{
-        height:48px;
-        box-sizing:border-box;
-        display:flex;
-        align-items:center;
-        gap:12px;
-        padding:0 17px;
-        border:1px solid #E8BD55;
-        border-radius:12px;
-        background:#FFF8E6;
-        color:#6D5414;
-        font-size:13px;
-        line-height:1;
-        margin:0 0 13px 0;
-        white-space:nowrap;
-        overflow:hidden;
-    }
-    .validation-notice-icon{
-        width:27px;
-        height:27px;
-        flex:0 0 auto;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:#D89400;
-    }
-    .validation-notice-icon svg{width:25px;height:25px;}
-    .validation-notice strong{font-weight:850;}
+.validation-notice{
+    height:48px;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 17px;
+    border:1px solid #E8BD55;
+    border-radius:12px;
+    background:#FFF8E6;
+    color:#6D5414;
+    font-size:13px;
+    line-height:1;
+    margin:0 0 13px 0;
+    white-space:nowrap;
+    overflow:hidden;
+}
+.validation-notice-icon{
+    width:27px;
+    height:27px;
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#D89400;
+}
+.validation-notice-icon svg{width:25px;height:25px;}
+.validation-notice strong{font-weight:850;}
 
-    .validation-grid{
-        display:grid;
-        grid-template-columns:repeat(3,minmax(0,1fr));
-        gap:24px;
-        align-items:stretch;
-        margin:0 0 13px 0;
-    }
-    .validation-card-locked{
-        height:304px;
-        box-sizing:border-box;
-        border:1px solid #C8DFF5;
-        border-radius:13px;
-        background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
-        padding:15px 16px 13px;
-        display:flex;
-        flex-direction:column;
-        overflow:hidden;
-    }
-    .validation-card-head{
-        display:grid;
-        grid-template-columns:52px 1fr;
-        align-items:center;
-        gap:12px;
-        min-height:58px;
-        margin-bottom:3px;
-    }
-    .validation-card-icon{
-        width:46px;
-        height:46px;
-        border-radius:50%;
-        background:#E8F3FF;
-        color:#1768B2;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-    .validation-card-icon svg{width:29px;height:29px;}
-    .validation-card-title{
-        color:#06285F;
-        font-size:16px;
-        font-weight:850;
-        line-height:1.15;
-        margin-bottom:5px;
-    }
-    .validation-card-sub{
-        color:#526D8E;
-        font-size:12.7px;
-        line-height:1.3;
-    }
-    .validation-chart{
-        flex:1;
-        min-height:0;
-        position:relative;
-        margin-top:2px;
-    }
-    .validation-chart svg{
-        width:100%;
-        height:100%;
-        display:block;
-    }
-    .validation-empty{
-        position:absolute;
-        left:50%;
-        top:49%;
-        transform:translate(-50%,-50%);
-        width:82%;
-        text-align:center;
-        pointer-events:none;
-    }
-    .validation-empty-icon{
-        width:58px;
-        height:58px;
-        border-radius:50%;
-        background:#E2F0FF;
-        color:#1768B2;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        margin:0 auto 9px;
-    }
-    .validation-empty-icon svg{width:34px;height:34px;}
-    .validation-empty-title{
-        color:#0A3D86;
-        font-size:13.5px;
-        font-weight:850;
-        line-height:1.2;
-        margin-bottom:4px;
-    }
-    .validation-empty-sub{
-        color:#5E78A0;
-        font-size:11.5px;
-        line-height:1.2;
-    }
-    .vaxis-label{
-        font-size:10.5px;
-        fill:#5C77A0;
-    }
-    .vtick{
-        font-size:9.5px;
-        fill:#6B83A3;
-    }
-    .vgrid{
-        stroke:#E5EEF8;
-        stroke-width:1;
-    }
-    .vaxis{
-        stroke:#92B3D6;
-        stroke-width:1.1;
-    }
-    .vref{
-        stroke:#8FB6E2;
-        stroke-width:1.4;
-        stroke-dasharray:6 6;
-    }
+.validation-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:24px;
+    align-items:stretch;
+    margin:0 0 13px 0;
+}
+.validation-card-locked{
+    height:304px;
+    box-sizing:border-box;
+    border:1px solid #C8DFF5;
+    border-radius:13px;
+    background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
+    padding:15px 16px 13px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+.validation-card-head{
+    display:grid;
+    grid-template-columns:52px 1fr;
+    align-items:center;
+    gap:12px;
+    min-height:58px;
+    margin-bottom:3px;
+}
+.validation-card-icon{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:#E8F3FF;
+    color:#1768B2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.validation-card-icon svg{width:29px;height:29px;}
+.validation-card-title{
+    color:#06285F;
+    font-size:16px;
+    font-weight:850;
+    line-height:1.15;
+    margin-bottom:5px;
+}
+.validation-card-sub{
+    color:#526D8E;
+    font-size:12.7px;
+    line-height:1.3;
+}
+.validation-chart{
+    flex:1;
+    min-height:0;
+    position:relative;
+    margin-top:2px;
+}
+.validation-chart svg{
+    width:100%;
+    height:100%;
+    display:block;
+}
+.validation-empty{
+    position:absolute;
+    left:50%;
+    top:49%;
+    transform:translate(-50%,-50%);
+    width:82%;
+    text-align:center;
+    pointer-events:none;
+}
+.validation-empty-icon{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    background:#E2F0FF;
+    color:#1768B2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 9px;
+}
+.validation-empty-icon svg{width:34px;height:34px;}
+.validation-empty-title{
+    color:#0A3D86;
+    font-size:13.5px;
+    font-weight:850;
+    line-height:1.2;
+    margin-bottom:4px;
+}
+.validation-empty-sub{
+    color:#5E78A0;
+    font-size:11.5px;
+    line-height:1.2;
+}
+.vaxis-label{
+    font-size:10.5px;
+    fill:#5C77A0;
+}
+.vtick{
+    font-size:9.5px;
+    fill:#6B83A3;
+}
+.vgrid{
+    stroke:#E5EEF8;
+    stroke-width:1;
+}
+.vaxis{
+    stroke:#92B3D6;
+    stroke-width:1.1;
+}
+.vref{
+    stroke:#8FB6E2;
+    stroke-width:1.4;
+    stroke-dasharray:6 6;
+}
 
-    .comparison-card{
-        box-sizing:border-box;
-        border:1px solid #C8DFF5;
-        border-radius:13px;
-        background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
-        padding:12px 16px 14px;
-        margin:0 0 12px 0;
-    }
-    .comparison-head{
-        display:grid;
-        grid-template-columns:52px 1fr;
-        align-items:center;
-        gap:12px;
-        margin-bottom:10px;
-    }
-    .comparison-icon{
-        width:46px;
-        height:46px;
-        border-radius:50%;
-        background:#E8F3FF;
-        color:#1768B2;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-    .comparison-icon svg{width:29px;height:29px;}
-    .comparison-title{
-        color:#06285F;
-        font-size:16px;
-        font-weight:850;
-        margin-bottom:4px;
-    }
-    .comparison-sub{
-        color:#526D8E;
-        font-size:12.8px;
-        line-height:1.3;
-    }
-    .comparison-table-wrap{
-        overflow:hidden;
-        border:1px solid #D9E7F5;
-        border-radius:8px;
-    }
-    .comparison-table{
-        width:100%;
-        border-collapse:collapse;
-        table-layout:fixed;
-        font-size:12px;
-    }
-    .comparison-table th{
-        background:#EEF5FC;
-        color:#06285F;
-        text-align:left;
-        font-weight:850;
-        padding:7px 11px;
-        border-bottom:1px solid #D5E4F3;
-    }
-    .comparison-table th:first-child{width:34%;}
-    .comparison-table td{
-        padding:6px 11px;
-        border-bottom:1px solid #E4EDF7;
-        color:#526D8E;
-        vertical-align:middle;
-        line-height:1.2;
-    }
-    .comparison-table tr:last-child td{border-bottom:none;}
-    .comparison-table td:first-child{
-        color:#06285F;
-        font-weight:750;
-        border-right:1px solid #E4EDF7;
-    }
+.comparison-card{
+    box-sizing:border-box;
+    border:1px solid #C8DFF5;
+    border-radius:13px;
+    background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
+    padding:12px 16px 14px;
+    margin:0 0 12px 0;
+}
+.comparison-head{
+    display:grid;
+    grid-template-columns:52px 1fr;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+.comparison-icon{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:#E8F3FF;
+    color:#1768B2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.comparison-icon svg{width:29px;height:29px;}
+.comparison-title{
+    color:#06285F;
+    font-size:16px;
+    font-weight:850;
+    margin-bottom:4px;
+}
+.comparison-sub{
+    color:#526D8E;
+    font-size:12.8px;
+    line-height:1.3;
+}
+.comparison-table-wrap{
+    overflow:hidden;
+    border:1px solid #D9E7F5;
+    border-radius:8px;
+}
+.comparison-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-size:12px;
+}
+.comparison-table th{
+    background:#EEF5FC;
+    color:#06285F;
+    text-align:left;
+    font-weight:850;
+    padding:7px 11px;
+    border-bottom:1px solid #D5E4F3;
+}
+.comparison-table th:first-child{width:34%;}
+.comparison-table td{
+    padding:6px 11px;
+    border-bottom:1px solid #E4EDF7;
+    color:#526D8E;
+    vertical-align:middle;
+    line-height:1.2;
+}
+.comparison-table tr:last-child td{border-bottom:none;}
+.comparison-table td:first-child{
+    color:#06285F;
+    font-weight:750;
+    border-right:1px solid #E4EDF7;
+}
 
-    .model-lock{
-        min-height:64px;
-        box-sizing:border-box;
-        border:1px solid #B8D8F6;
-        border-radius:12px;
-        background:linear-gradient(90deg,#EEF7FF 0%,#E7F2FD 100%);
-        display:grid;
-        grid-template-columns:62px 1fr;
-        align-items:center;
-        gap:10px;
-        padding:8px 16px 8px 12px;
-        margin:0 0 12px 0;
-    }
-    .model-lock-icon{
-        width:48px;
-        height:48px;
-        border-radius:50%;
-        background:linear-gradient(180deg,#2C65AA,#0A438D);
-        color:#fff;
-        border:4px solid #D9EAFE;
-        box-shadow:0 0 0 1px #8BB7E7;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-    .model-lock-icon svg{width:27px;height:27px;}
-    .model-lock-copy{
-        color:#315C91;
-        font-size:12.7px;
-        line-height:1.35;
-    }
-    .model-lock-copy strong{color:#0B3D8A;font-weight:850;}
+.model-lock{
+    min-height:64px;
+    box-sizing:border-box;
+    border:1px solid #B8D8F6;
+    border-radius:12px;
+    background:linear-gradient(90deg,#EEF7FF 0%,#E7F2FD 100%);
+    display:grid;
+    grid-template-columns:62px 1fr;
+    align-items:center;
+    gap:10px;
+    padding:8px 16px 8px 12px;
+    margin:0 0 12px 0;
+}
+.model-lock-icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:linear-gradient(180deg,#2C65AA,#0A438D);
+    color:#fff;
+    border:4px solid #D9EAFE;
+    box-shadow:0 0 0 1px #8BB7E7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.model-lock-icon svg{width:27px;height:27px;}
+.model-lock-copy{
+    color:#315C91;
+    font-size:12.7px;
+    line-height:1.35;
+}
+.model-lock-copy strong{color:#0B3D8A;font-weight:850;}
 
-    .footer.validation-footer{
-        height:47px;
-        box-sizing:border-box;
-        border-top:1px solid #CFE0F2;
-        margin-top:0!important;
-        padding-top:12px!important;
-        font-size:10.5px!important;
-        color:#68809A;
-        display:grid!important;
-        grid-template-columns:1fr 1fr 1fr;
-        align-items:start;
-    }
-    .footer.validation-footer>div:nth-child(1){text-align:left}
-    .footer.validation-footer>div:nth-child(2){text-align:center}
-    .footer.validation-footer>div:nth-child(3){text-align:right}
+.footer.validation-footer{
+    height:47px;
+    box-sizing:border-box;
+    border-top:1px solid #CFE0F2;
+    margin-top:0!important;
+    padding-top:12px!important;
+    font-size:10.5px!important;
+    color:#68809A;
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1fr;
+    align-items:start;
+}
+.footer.validation-footer>div:nth-child(1){text-align:left}
+.footer.validation-footer>div:nth-child(2){text-align:center}
+.footer.validation-footer>div:nth-child(3){text-align:right}
 
-    @media(max-width:1100px){
-        .validation-title-row{grid-template-columns:1fr;min-height:auto;}
-        .validation-brand-message{display:none}
-        .validation-grid{grid-template-columns:1fr;gap:12px}
-        .validation-card-locked{height:310px}
-        .validation-notice{height:auto;min-height:48px;white-space:normal;line-height:1.35;padding-top:9px;padding-bottom:9px}
-    }
-    @media(max-width:760px){
-        .validation-title{font-size:29px}
-        .validation-sub{font-size:14px}
-        .comparison-table{font-size:11px}
-        .comparison-table th,.comparison-table td{padding:6px 7px}
-        .model-lock{grid-template-columns:52px 1fr}
-        .footer.validation-footer{height:auto;grid-template-columns:1fr;gap:4px}
-        .footer.validation-footer>div{text-align:left!important}
-    }
-    </style>
+@media(max-width:1100px){
+    .validation-title-row{grid-template-columns:1fr;min-height:auto;}
+    .validation-brand-message{display:none}
+    .validation-grid{grid-template-columns:1fr;gap:12px}
+    .validation-card-locked{height:310px}
+    .validation-notice{height:auto;min-height:48px;white-space:normal;line-height:1.35;padding-top:9px;padding-bottom:9px}
+}
+@media(max-width:760px){
+    .validation-title{font-size:29px}
+    .validation-sub{font-size:14px}
+    .comparison-table{font-size:11px}
+    .comparison-table th,.comparison-table td{padding:6px 7px}
+    .model-lock{grid-template-columns:52px 1fr}
+    .footer.validation-footer{height:auto;grid-template-columns:1fr;gap:4px}
+    .footer.validation-footer>div{text-align:left!important}
+}
+</style>
     """, unsafe_allow_html=True)
 
     # Shared-looking title row.
