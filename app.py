@@ -441,12 +441,40 @@ elif page == "AMBER Calculator":
     .calc-metric{{height:82px!important;}}
     .calc-warning-icon,.calc-warning-icon svg{{width:34px!important;height:34px!important;}}
     .calc-demo-alert{{margin-top:10px!important;}}
-    .st-key-amber_results_panel .stDownloadButton{{margin-top:13px!important;}}
+    .st-key-amber_results_panel .stDownloadButton{{margin-top:0!important;}}
     .st-key-amber_results_panel .stDownloadButton button{{height:49px!important;min-height:49px!important;}}
     .st-key-amber_results_panel .stDownloadButton button:before{{width:21px!important;height:21px!important;background-size:21px 21px!important;}}
 
     .st-key-amber_results_panel > div[data-testid="stVerticalBlock"],
-    .st-key-amber_scientific_panel > div[data-testid="stVerticalBlock"]{{height:100%!important;}}
+    .st-key-amber_scientific_panel > div[data-testid="stVerticalBlock"]{{
+        height:100%!important;
+        min-height:100%!important;
+        display:flex!important;
+        flex-direction:column!important;
+    }}
+
+
+    /* FINAL PAGE-2 DEAD-SPACE MICRO-PASS */
+    .st-key-amber_results_actions{{
+        margin-top:auto!important;
+        padding-top:12px!important;
+        padding-bottom:8px!important;
+    }}
+    .st-key-amber_results_actions .calc-demo-alert{{
+        margin-top:0!important;
+    }}
+    .st-key-amber_results_actions .stDownloadButton{{
+        margin-top:13px!important;
+    }}
+
+    .st-key-amber_science_bottom{{
+        margin-top:auto!important;
+        padding-top:16px!important;
+        padding-bottom:8px!important;
+    }}
+    .st-key-amber_science_bottom .calc-safeguard{{
+        margin-top:0!important;
+    }}
 
     .calc-science-intro{{font-size:13px!important;line-height:1.48!important;}}
     .st-key-amber_scientific_panel [data-testid="stLatex"]:nth-of-type(-n+2) .katex{{font-size:1.16em!important;}}
@@ -520,10 +548,11 @@ elif page == "AMBER Calculator":
             else:
                 st.markdown(segmented_gauge_html(r["score"], active=True), unsafe_allow_html=True)
                 st.markdown(f"""<div class="calc-metrics"><div class="calc-metric"><div class="calc-metric-label">Aβ42/Aβ40</div><div class="calc-metric-value">{r["ratio"]:.4f}</div></div><div class="calc-metric"><div class="calc-metric-label">R</div><div class="calc-metric-value">{r["R"]:.3f}</div></div><div class="calc-metric"><div class="calc-metric-label">M</div><div class="calc-metric-value">{r["M"]:.3f}</div></div></div>""", unsafe_allow_html=True)
-                st.markdown(f"""<div class="calc-demo-alert"><div class="calc-warning-icon">{SVG_WARNING_TRI}</div><div><div class="calc-demo-title">DEMONSTRATION OUTPUT ONLY.</div><div class="calc-demo-copy">Placeholder coefficients are used only to demonstrate the interface. This is not a clinically validated AMBER result.</div></div></div>""", unsafe_allow_html=True)
-                if st.session_state.amber_report is not None:
-                    pdf_bytes = build_amber_pdf(st.session_state.amber_report)
-                    st.download_button("Download results summary (PDF)", data=pdf_bytes, file_name="AMBER_V01_results_summary.pdf", mime="application/pdf", use_container_width=True, key="amber_pdf_download")
+                with st.container(border=False, key="amber_results_actions"):
+                    st.markdown(f"""<div class="calc-demo-alert"><div class="calc-warning-icon">{SVG_WARNING_TRI}</div><div><div class="calc-demo-title">DEMONSTRATION OUTPUT ONLY.</div><div class="calc-demo-copy">Placeholder coefficients are used only to demonstrate the interface. This is not a clinically validated AMBER result.</div></div></div>""", unsafe_allow_html=True)
+                    if st.session_state.amber_report is not None:
+                        pdf_bytes = build_amber_pdf(st.session_state.amber_report)
+                        st.download_button("Download results summary (PDF)", data=pdf_bytes, file_name="AMBER_V01_results_summary.pdf", mime="application/pdf", use_container_width=True, key="amber_pdf_download")
 
     with c3:
         with st.container(border=False, key="amber_scientific_panel"):
@@ -534,7 +563,9 @@ elif page == "AMBER Calculator":
             st.latex(r"I=\beta_0+\beta_RR+\beta_MM+\beta_AAge+\beta_SSex")
             st.markdown('<div class="calc-science-heading" style="margin-top:5px">Probability</div>', unsafe_allow_html=True)
             st.latex(r"P=\frac{1}{1+e^{-I}}")
-            st.markdown(f"""<div class="calc-safeguard"><div class="calc-bulb">{SVG_BULB}</div><div><b>Scientific safeguard:</b> no final β coefficients, clinical thresholds, AUC, sensitivity, specificity, or model-lock date are shown until they are empirically derived and validated.</div></div>""", unsafe_allow_html=True)
+            with st.container(border=False, key="amber_science_bottom"):
+
+                st.markdown(f"""<div class="calc-safeguard"><div class="calc-bulb">{SVG_BULB}</div><div><b>Scientific safeguard:</b> no final β coefficients, clinical thresholds, AUC, sensitivity, specificity, or model-lock date are shown until they are empirically derived and validated.</div></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="calc-workflow"><div class="calc-workflow-intro"><div class="calc-workflow-title">What happens after you click Calculate?</div><div class="calc-workflow-sub">From input to AMBER score in four steps.</div></div><div class="calc-workflow-sep"></div><div class="calc-workflow-steps"><div class="calc-work-step"><div class="calc-work-num">1</div><div class="calc-work-icon">{SVG_CLIPBOARD}</div><div><div class="calc-work-title">Read inputs</div><div class="calc-work-copy">Get biomarker (and<br>demographic) values.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">2</div><div class="calc-work-icon">{SVG_GEAR}</div><div><div class="calc-work-title">Derive features</div><div class="calc-work-copy">Compute ratio (R)<br>and geometric mean (M).</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">3</div><div class="calc-work-icon">{SVG_CHART}</div><div><div class="calc-work-title">Apply model</div><div class="calc-work-copy">Calculate I and convert<br>to probability.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">4</div><div class="calc-work-icon">{SVG_REPORT}</div><div><div class="calc-work-title">Report</div><div class="calc-work-copy">Display score and<br>summary outputs.</div></div></div></div></div>""", unsafe_allow_html=True)
 
