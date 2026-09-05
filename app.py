@@ -503,7 +503,7 @@ elif page == "AMBER Calculator":
     }}
     .st-key-amber_results_actions .stDownloadButton,
     .st-key-amber_results_actions [data-testid="stDownloadButton"]{{
-        margin-top:0!important;
+        margin-top:16px!important;
     }}
 
     .st-key-amber_science_bottom{{
