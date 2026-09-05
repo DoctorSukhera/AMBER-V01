@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://amber-v01.streamlit.app/"><strong>Open the AMBER V0.1 research prototype →</strong></a>
+  <a href="https://amber-testing.streamlit.app//"><strong>Open the AMBER V0.1 research prototype →</strong></a>
 </p>
 
 ![AMBER Score Platform interface](docs/images/01-home.webp)
