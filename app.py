@@ -589,6 +589,14 @@ elif page == "AMBER Calculator":
     st.markdown(f"""<div class="calc-workflow"><div class="calc-workflow-intro"><div class="calc-workflow-title">What happens after you click Calculate?</div><div class="calc-workflow-sub">From input to AMBER score in four steps.</div></div><div class="calc-workflow-sep"></div><div class="calc-workflow-steps"><div class="calc-work-step"><div class="calc-work-num">1</div><div class="calc-work-icon">{SVG_CLIPBOARD}</div><div><div class="calc-work-title">Read inputs</div><div class="calc-work-copy">Get biomarker (and<br>demographic) values.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">2</div><div class="calc-work-icon">{SVG_GEAR}</div><div><div class="calc-work-title">Derive features</div><div class="calc-work-copy">Compute ratio (R)<br>and geometric mean (M).</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">3</div><div class="calc-work-icon">{SVG_CHART}</div><div><div class="calc-work-title">Apply model</div><div class="calc-work-copy">Calculate I and convert<br>to probability.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">4</div><div class="calc-work-icon">{SVG_REPORT}</div><div><div class="calc-work-title">Report</div><div class="calc-work-copy">Display score and<br>summary outputs.</div></div></div></div></div>""", unsafe_allow_html=True)
 
 elif page == "DNA Compass / Method":
+    def _render_dna_html(raw_html):
+        """Render Page-3 HTML without Markdown treating indented blocks as code."""
+        normalized_lines = []
+        for line in raw_html.splitlines():
+            if line.startswith("    "):
+                line = line[4:]
+            normalized_lines.append(line)
+        st.markdown("\n".join(normalized_lines), unsafe_allow_html=True)
     st.markdown("""
     <style>
     /* ==========================================================
@@ -805,8 +813,8 @@ elif page == "DNA Compass / Method":
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class="dna-title-row">
+    _render_dna_html(f"""
+    <div class="dna-title-row>
       <div class="dna-title-left">
         <div class="dna-kicker">NANOTECHNOLOGY LAYER</div>
         <div class="dna-title">Integrated molecular workflow</div>
@@ -900,7 +908,7 @@ elif page == "DNA Compass / Method":
       <div class="dna-disclosure-icon">{SVG_MEGAPHONE}</div>
       <div><strong>Public-disclosure boundary:</strong> exact DNA sequences, architecture dimensions, fabrication parameters, recognition chemistry and other potentially novel implementation details are intentionally not displayed here.</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
 elif page == "Model & Validation":
     st.markdown('<div class="kicker">Evidence framework</div><div class="page-title">Future validation dashboard</div><div class="page-sub">Real dashboard components are shown in an empty state until PET-linked validation data are available.</div>', unsafe_allow_html=True)
