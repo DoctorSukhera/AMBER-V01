@@ -1474,19 +1474,407 @@ elif page == "Model & Validation":
     """)
 
 
-else:
-    st.markdown('<div class="kicker">Scientific information</div><div class="page-title">About AMBER</div>', unsafe_allow_html=True)
-    st.markdown('''<div class="info-bar"><div class="info-icon">i</div><div><div class="info-title">AMBER is a research architecture, not yet a clinical diagnostic product.</div><div class="info-body">Its purpose is to integrate DNA Compass molecular measurement with transparent computational modelling and later PET-linked validation in a reproducible research platform.</div></div></div>''', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Development sequence</div>', unsafe_allow_html=True)
-    st.markdown('''<div class="timeline"><div class="tstep"><div class="tnum">1</div><div class="ticon">💻</div><div class="ttitle">App</div><div class="tbody">Finalize the research-oriented user interface and computational architecture.</div><span class="tstatus current">Current</span></div><div class="tstep"><div class="tnum">2</div><div class="ticon">📄</div><div class="ttitle">Patent</div><div class="tbody">Define the protectable DNA Compass + AMBER technical architecture and prepare filing documents.</div><span class="tstatus">Next</span></div><div class="tstep"><div class="tnum">3</div><div class="ticon">🏥</div><div class="ttitle">Hospital data</div><div class="tbody">Obtain paired Aβ40, Aβ42 and amyloid PET outcome data under the approved study design.</div><span class="tstatus">Future</span></div><div class="tstep"><div class="tnum">4</div><div class="ticon">📊</div><div class="ttitle">Validation</div><div class="tbody">Use the Colab scientific pipeline for derivation, bootstrap validation, calibration and external validation.</div><span class="tstatus">Future</span></div><div class="tstep"><div class="tnum">5</div><div class="ticon">☁️</div><div class="ttitle">Update</div><div class="tbody">Load the frozen validated model artifact into AMBER and release the new version.</div><span class="tstatus">After evidence</span></div></div>''', unsafe_allow_html=True)
-    st.write("")
-    a,b = st.columns(2,gap="large")
-    with a:
-        st.markdown('<div class="panel"><div class="icon-card" style="border:none;padding:0"><div class="icon-bubble">👥</div><div><div class="icon-title" style="font-size:1.12rem">Project</div><div class="icon-body"><b>A Project by</b><br>Fahim ElKassim<br><br><b>Supervised by</b><br>Prof. Xingyi Ma<br>NanoMax Group, HIT Shenzhen</div></div></div></div>', unsafe_allow_html=True)
-    with b:
-        st.markdown('<div class="panel"><div class="icon-card" style="border:none;padding:0"><div class="icon-bubble">⚙️</div><div><div class="icon-title" style="font-size:1.12rem">Development</div><div class="icon-body"><b>Designed and Developed by</b><br>Doctor Sukhera（学睿）<br><br><b>Version</b><br>AMBER V0.1 · Research Prototype<br><br><b>Technology</b><br>Dual-biomarker computational inference using Aβ42/Aβ40-derived features (ratio, R, M) with staged PET-linked validation.</div></div></div></div>', unsafe_allow_html=True)
-    st.write("")
-    st.markdown('<div class="notice"><b>📣 IP note:</b> potentially novel DNA Compass engineering details should remain outside the public application until institutional patent filing is complete.</div>', unsafe_allow_html=True)
+
+elif page == "About AMBER":
+    def _render_about_html(raw_html):
+        """Render Page-5 HTML as one compact stream so nested SVG/HTML
+        cannot be interpreted by Streamlit Markdown as code blocks."""
+        compact_html = "".join(
+            line.lstrip()
+            for line in raw_html.splitlines()
+            if line.strip()
+        )
+        st.markdown(compact_html, unsafe_allow_html=True)
+
+    # Page-5-only SVG icon set. No OS/Unicode emoji are used.
+    ABOUT_INFO = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'>
+      <circle cx='32' cy='32' r='24'/><path d='M32 28v18'/><circle cx='32' cy='19' r='2.2' fill='currentColor' stroke='none'/>
+    </svg>"""
+    ABOUT_LAPTOP = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+      <rect x='12' y='11' width='40' height='29' rx='2'/><path d='M7 48h50l-4 7H11l-4-7Z'/><path d='M21 46h22'/>
+    </svg>"""
+    ABOUT_DOCUMENT = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+      <path d='M17 7h23l10 10v40H17Z'/><path d='M40 7v12h10M24 30h19M24 38h19M24 46h14'/>
+    </svg>"""
+    ABOUT_HOSPITAL = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+      <path d='M10 55V19h12V9h20v10h12v36H10Z'/><path d='M28 20h8M32 16v8M18 29h7M18 39h7M39 29h7M39 39h7M28 55V43h8v12'/>
+    </svg>"""
+    ABOUT_CHART = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'>
+      <path d='M10 52h44'/><rect x='15' y='34' width='8' height='14' rx='1' fill='currentColor' stroke='none'/><rect x='28' y='25' width='8' height='23' rx='1' fill='currentColor' stroke='none'/><rect x='41' y='14' width='8' height='34' rx='1' fill='currentColor' stroke='none'/>
+    </svg>"""
+    ABOUT_UPLOAD = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+      <path d='M20 47H16a10 10 0 0 1-1-20 17 17 0 0 1 32-2 11 11 0 0 1 1 22H37'/><path d='M32 53V29M23 38l9-9 9 9'/>
+    </svg>"""
+    ABOUT_PEOPLE = """<svg viewBox='0 0 64 64' fill='currentColor'>
+      <circle cx='32' cy='19' r='8'/><circle cx='15' cy='24' r='6'/><circle cx='49' cy='24' r='6'/>
+      <path d='M20 49c0-9 5-15 12-15s12 6 12 15v5H20v-5ZM4 53v-4c0-8 4-13 11-13 3 0 5 1 7 3-3 4-5 9-5 15H4ZM60 53v-4c0-8-4-13-11-13-3 0-5 1-7 3 3 4 5 9 5 15h13Z'/>
+    </svg>"""
+    ABOUT_GEAR = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3.1' stroke-linecap='round' stroke-linejoin='round'>
+      <circle cx='32' cy='32' r='9'/><path d='m32 7 4 7 8 2 6-5 7 7-5 6 2 8 7 4-4 10-8-2-6 5v8H31v-8l-7-5-8 2-4-10 7-4 2-8-5-6 7-7 6 5 8-2 4-7Z'/>
+    </svg>"""
+    ABOUT_ARROW = """<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'>
+      <path d='M5 12h13M14 7l5 5-5 5'/>
+    </svg>"""
+    ABOUT_MEGAPHONE = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+      <path d='M11 29v9h9l23 10V19L20 29h-9Z'/><path d='M20 38 24 53h8l-5-12M49 24l6-5M50 34h8M49 44l6 5'/>
+    </svg>"""
+
+    st.markdown("""
+    <style>
+    /* ==========================================================
+       PAGE 5 — ABOUT AMBER FINAL LOCK
+       Scoped About-page geometry only. Shared hero/nav untouched.
+       ========================================================== */
+    .about5-kicker{
+        color:#0B4EA1;
+        font-size:12px;
+        font-weight:850;
+        text-transform:uppercase;
+        letter-spacing:1.6px;
+        line-height:1;
+        margin:16px 0 10px;
+    }
+    .about5-title{
+        color:#06285F;
+        font-size:38px;
+        line-height:1.03;
+        font-weight:850;
+        letter-spacing:-.7px;
+        margin:0 0 18px;
+    }
+
+    .about5-info{
+        box-sizing:border-box;
+        min-height:114px;
+        display:grid;
+        grid-template-columns:76px 1px 1fr;
+        align-items:center;
+        gap:25px;
+        padding:14px 27px;
+        border:1px solid #BDD9F4;
+        border-radius:13px;
+        background:linear-gradient(90deg,#F3F9FF 0%,#EDF6FF 50%,#F7FBFF 100%);
+        margin:0 0 15px;
+    }
+    .about5-info-icon{
+        width:66px;height:66px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        color:white;
+        background:linear-gradient(180deg,#2E6DB4,#0A438F);
+        border:6px solid #DDEEFF;
+        box-shadow:0 0 0 1px #8DBAE8;
+    }
+    .about5-info-icon svg{width:36px;height:36px}
+    .about5-info-sep{width:1px;height:72px;background:#9BC6EE}
+    .about5-info-title{
+        color:#06285F;
+        font-size:17px;
+        font-weight:850;
+        line-height:1.25;
+        margin-bottom:7px;
+    }
+    .about5-info-body{
+        color:#315C91;
+        font-size:15.2px;
+        line-height:1.4;
+    }
+
+    .about5-section-title{
+        color:#06285F;
+        font-size:21px;
+        line-height:1.1;
+        font-weight:850;
+        margin:0 0 9px;
+    }
+
+    .about5-timeline{
+        display:grid;
+        grid-template-columns:1fr 28px 1fr 28px 1fr 28px 1fr 28px 1fr;
+        align-items:center;
+        gap:0;
+        margin:0 0 14px;
+    }
+    .about5-step{
+        height:220px;
+        box-sizing:border-box;
+        border:1px solid #C8DFF5;
+        border-radius:13px;
+        background:linear-gradient(180deg,#FFFFFF,#FCFEFF);
+        padding:14px 13px 12px;
+        position:relative;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        text-align:center;
+        overflow:hidden;
+    }
+    .about5-num{
+        position:absolute;
+        top:13px;
+        left:13px;
+        width:38px;height:38px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        background:#E7F2FF;
+        color:#0A4D9A;
+        font-size:16px;
+        font-weight:850;
+    }
+    .about5-step-icon{
+        width:64px;height:64px;
+        display:flex;align-items:center;justify-content:center;
+        color:#1768B2;
+        margin-top:9px;
+        margin-bottom:4px;
+    }
+    .about5-step-icon svg{width:52px;height:52px}
+    .about5-step-title{
+        color:#06285F;
+        font-size:17px;
+        font-weight:850;
+        line-height:1.1;
+        margin:0 0 7px;
+    }
+    .about5-step-body{
+        color:#315C91;
+        font-size:13.2px;
+        line-height:1.28;
+        flex:1;
+        display:flex;
+        align-items:flex-start;
+        justify-content:center;
+    }
+    .about5-status{
+        min-width:92px;
+        height:28px;
+        padding:0 14px;
+        box-sizing:border-box;
+        border-radius:999px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        background:#E7F2FF;
+        color:#0B4EA1;
+        font-size:12px;
+        font-weight:800;
+        margin-top:7px;
+    }
+    .about5-status.current{
+        background:#FFF0C9;
+        color:#765411;
+    }
+    .about5-status.after{min-width:118px}
+    .about5-arrow{
+        width:28px;height:28px;
+        color:#86A6CA;
+        display:flex;align-items:center;justify-content:center;
+    }
+    .about5-arrow svg{width:25px;height:25px}
+
+    .about5-lower{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:22px;
+        margin:0 0 13px;
+    }
+    .about5-lower-card{
+        min-height:186px;
+        box-sizing:border-box;
+        border:1px solid #C8DFF5;
+        border-radius:13px;
+        background:linear-gradient(180deg,#FFFFFF,#FCFEFF);
+        padding:18px 25px;
+        display:grid;
+        grid-template-columns:112px 1fr;
+        gap:22px;
+        align-items:center;
+    }
+    .about5-lower-icon{
+        width:88px;height:88px;border-radius:50%;
+        background:#E2F0FF;
+        color:#1768B2;
+        display:flex;align-items:center;justify-content:center;
+        justify-self:center;
+    }
+    .about5-lower-icon svg{width:54px;height:54px}
+    .about5-lower-title{
+        color:#06285F;
+        font-size:20px;
+        font-weight:850;
+        line-height:1.1;
+        margin:0 0 11px;
+    }
+    .about5-meta-label{
+        color:#163E77;
+        font-size:13px;
+        font-weight:850;
+        line-height:1.2;
+        margin-top:7px;
+    }
+    .about5-meta-label:first-of-type{margin-top:0}
+    .about5-meta-body{
+        color:#315C91;
+        font-size:13.4px;
+        line-height:1.34;
+        margin-top:2px;
+    }
+    .about5-tech{
+        font-size:12.7px;
+        line-height:1.32;
+    }
+
+    .about5-ip{
+        min-height:48px;
+        box-sizing:border-box;
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:8px 17px;
+        border:1px solid #E6B849;
+        border-radius:11px;
+        background:#FFF8E5;
+        color:#6D5414;
+        font-size:13.4px;
+        line-height:1.25;
+        margin:0 0 12px;
+    }
+    .about5-ip-icon{
+        width:28px;height:28px;
+        color:#D89400;
+        flex:0 0 auto;
+        display:flex;align-items:center;justify-content:center;
+    }
+    .about5-ip-icon svg{width:27px;height:27px}
+    .about5-ip strong{font-weight:850}
+
+    .footer.about5-footer{
+        height:47px;
+        box-sizing:border-box;
+        border-top:1px solid #CFE0F2;
+        margin-top:0!important;
+        padding-top:12px!important;
+        font-size:10.5px!important;
+        color:#68809A;
+        display:grid!important;
+        grid-template-columns:1fr 1fr 1fr;
+        align-items:start;
+    }
+    .footer.about5-footer>div:nth-child(1){text-align:left}
+    .footer.about5-footer>div:nth-child(2){text-align:center}
+    .footer.about5-footer>div:nth-child(3){text-align:right}
+
+    @media(max-width:1150px){
+        .about5-timeline{grid-template-columns:1fr;gap:10px}
+        .about5-arrow{transform:rotate(90deg);justify-self:center}
+        .about5-step{height:auto;min-height:195px}
+        .about5-lower{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+        .about5-title{font-size:30px}
+        .about5-info{grid-template-columns:64px 1px 1fr;gap:16px;padding:14px 16px}
+        .about5-info-icon{width:56px;height:56px}
+        .about5-info-sep{height:62px}
+        .about5-info-title{font-size:15px}
+        .about5-info-body{font-size:13.5px}
+        .about5-lower-card{grid-template-columns:1fr;text-align:left}
+        .about5-lower-icon{justify-self:start}
+        .about5-ip{align-items:flex-start}
+        .footer.about5-footer{height:auto;grid-template-columns:1fr;gap:4px}
+        .footer.about5-footer>div{text-align:left!important}
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    _render_about_html(f"""
+    <div class="about5-kicker">SCIENTIFIC INFORMATION</div>
+    <div class="about5-title">About AMBER</div>
+
+    <div class="about5-info">
+      <div class="about5-info-icon">{ABOUT_INFO}</div>
+      <div class="about5-info-sep"></div>
+      <div>
+        <div class="about5-info-title">AMBER is a research architecture, not yet a clinical diagnostic product.</div>
+        <div class="about5-info-body">Its purpose is to integrate DNA Compass molecular measurement with transparent computational modelling and later PET-linked validation in a reproducible research platform.</div>
+      </div>
+    </div>
+
+    <div class="about5-section-title">Development sequence</div>
+    <div class="about5-timeline">
+      <div class="about5-step">
+        <div class="about5-num">1</div>
+        <div class="about5-step-icon">{ABOUT_LAPTOP}</div>
+        <div class="about5-step-title">App</div>
+        <div class="about5-step-body">Finalize the best research-oriented user interface and computational architecture.</div>
+        <div class="about5-status current">Current</div>
+      </div>
+      <div class="about5-arrow">{ABOUT_ARROW}</div>
+
+      <div class="about5-step">
+        <div class="about5-num">2</div>
+        <div class="about5-step-icon">{ABOUT_DOCUMENT}</div>
+        <div class="about5-step-title">Patent</div>
+        <div class="about5-step-body">Define the protectable DNA Compass + AMBER technical architecture and prepare filing documents.</div>
+        <div class="about5-status">Next</div>
+      </div>
+      <div class="about5-arrow">{ABOUT_ARROW}</div>
+
+      <div class="about5-step">
+        <div class="about5-num">3</div>
+        <div class="about5-step-icon">{ABOUT_HOSPITAL}</div>
+        <div class="about5-step-title">Hospital data</div>
+        <div class="about5-step-body">Obtain paired Aβ40, Aβ42 and amyloid PET outcome data under the approved study design.</div>
+        <div class="about5-status">Future</div>
+      </div>
+      <div class="about5-arrow">{ABOUT_ARROW}</div>
+
+      <div class="about5-step">
+        <div class="about5-num">4</div>
+        <div class="about5-step-icon">{ABOUT_CHART}</div>
+        <div class="about5-step-title">Validation</div>
+        <div class="about5-step-body">Use the Colab scientific pipeline for derivation, bootstrap validation, calibration and external validation.</div>
+        <div class="about5-status">Future</div>
+      </div>
+      <div class="about5-arrow">{ABOUT_ARROW}</div>
+
+      <div class="about5-step">
+        <div class="about5-num">5</div>
+        <div class="about5-step-icon">{ABOUT_UPLOAD}</div>
+        <div class="about5-step-title">Update</div>
+        <div class="about5-step-body">Load the frozen validated model artifact into the AMBER application and release the new version.</div>
+        <div class="about5-status after">After evidence</div>
+      </div>
+    </div>
+
+    <div class="about5-lower">
+      <div class="about5-lower-card">
+        <div class="about5-lower-icon">{ABOUT_PEOPLE}</div>
+        <div>
+          <div class="about5-lower-title">Project</div>
+          <div class="about5-meta-label">A Project by</div>
+          <div class="about5-meta-body">Fahim ElKassim</div>
+          <div class="about5-meta-label">Supervised by</div>
+          <div class="about5-meta-body">Prof. Xingyi Ma<br>NanoMax Group, HIT Shenzhen</div>
+        </div>
+      </div>
+
+      <div class="about5-lower-card">
+        <div class="about5-lower-icon">{ABOUT_GEAR}</div>
+        <div>
+          <div class="about5-lower-title">Development</div>
+          <div class="about5-meta-label">Designed and Developed by</div>
+          <div class="about5-meta-body">Doctor Sukhera (学睿)</div>
+          <div class="about5-meta-label">Version</div>
+          <div class="about5-meta-body">AMBER V0.1 · Research Prototype</div>
+          <div class="about5-meta-label">Technology &amp; AI pipeline</div>
+          <div class="about5-meta-body about5-tech">Python + Streamlit research application with custom web UI, algorithmic Aβ40/Aβ42 feature engineering (ratio, R, M), AMBER-B/AMBER-C probabilistic modelling, and an AI/ML-ready PET-linked pipeline for model derivation, calibration, bootstrap validation and external validation.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about5-ip">
+      <div class="about5-ip-icon">{ABOUT_MEGAPHONE}</div>
+      <div><strong>IP note:</strong> potentially novel DNA Compass engineering details should remain outside the public application until institutional patent filing is complete.</div>
+    </div>
+    """)
 
 if page == "Home":
     footer_class = "footer home-footer"
@@ -1494,6 +1882,8 @@ elif page == "DNA Compass / Method":
     footer_class = "footer dna-footer"
 elif page == "Model & Validation":
     footer_class = "footer validation-footer"
+elif page == "About AMBER":
+    footer_class = "footer about5-footer"
 else:
     footer_class = "footer"
 st.markdown(f'<div class="{footer_class}"><div><b>{APP_VERSION}</b></div><div>Model status: {MODEL_STATUS}</div><div>Research use only · Not a diagnostic test</div></div>', unsafe_allow_html=True)
