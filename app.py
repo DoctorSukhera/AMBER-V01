@@ -206,26 +206,37 @@ def _arc_path(cx, cy, r, start_deg, end_deg):
     return f"M {x1:.2f} {y1:.2f} A {r} {r} 0 {large} {sweep} {x2:.2f} {y2:.2f}"
 
 
-def segmented_gauge_html(score):
-    score = max(0.0, min(100.0, float(score)))
-    cx, cy, r = 180, 174, 128
-    palette = ['#9FCBF5','#82B8EC','#AFC1CB','#D5D7C5','#F5D47B','#F4B42D','#F0BF48','#E7EAF0','#E7EAF0','#E7EAF0']
+def segmented_gauge_html(score=None, active=True):
+    """Deterministic segmented AMBER semicircle for active demo or inactive preview state."""
+    cx, cy, r = 200, 180, 142
+    stroke_w = 23
+    neutral = '#E8EDF3'
+    palette = ['#A7D2F6','#83B9EB','#AFC1CB','#D6D8C8','#F6D572','#F4AD1D','#F0BF48','#E8EBF0','#E8EBF0','#E8EBF0']
     paths = []
+    score_value = None if score is None else max(0.0, min(100.0, float(score)))
     for i in range(10):
         lo, hi = i*10, (i+1)*10
-        start = 180 - lo*1.8 + 0.7
-        end = 180 - hi*1.8 - 0.7
-        color = palette[i] if lo < score else '#E7EAF0'
-        paths.append(f"<path d='{_arc_path(cx,cy,r,start,end)}' fill='none' stroke='{color}' stroke-width='24' stroke-linecap='butt'/>")
+        start = 180 - lo*1.8 + 0.65
+        end = 180 - hi*1.8 - 0.65
+        color = palette[i] if active and score_value is not None and lo < score_value else neutral
+        paths.append(f"<path d='{_arc_path(cx,cy,r,start,end)}' fill='none' stroke='{color}' stroke-width='{stroke_w}' stroke-linecap='butt'/>")
+    if active and score_value is not None:
+        center = f"<div class='locked-gauge-score'><div class='main'>{score_value:.1f}</div><div class='den'>/ 100</div></div>"
+        caption = "<div class='locked-gauge-caption'>Illustrative AMBER software output</div>"
+        aria = 'Illustrative AMBER software output gauge'
+    else:
+        center = "<div class='locked-gauge-score inactive'><div class='main'>—</div><div class='off'>Illustrative probability off</div></div>"
+        caption = "<div class='locked-gauge-caption inactive'>Enable “Use illustrative demo probability”<br>to preview a demonstration score.</div>"
+        aria = 'Illustrative AMBER probability preview is disabled'
     return f"""
     <div class='locked-gauge'>
       <div class='g50'>50</div><div class='g0'>0</div><div class='g100'>100</div>
-      <svg viewBox='0 0 360 205' aria-label='Illustrative AMBER software output gauge'>
-        <path d='{_arc_path(cx,cy,r,180,0)}' fill='none' stroke='#E7EAF0' stroke-width='24'/>
+      <svg viewBox='0 0 400 218' aria-label='{aria}'>
+        <path d='{_arc_path(cx,cy,r,180,0)}' fill='none' stroke='{neutral}' stroke-width='{stroke_w}'/>
         {''.join(paths)}
       </svg>
-      <div class='locked-gauge-score'><div class='main'>{score:.1f}</div><div class='den'>/ 100</div></div>
-      <div class='locked-gauge-caption'>Illustrative AMBER software output</div>
+      {center}
+      {caption}
     </div>
     """
 
@@ -260,6 +271,8 @@ def build_amber_pdf(report):
         rows += [('Age', str(report['inputs']['age'])), ('Sex', str(report['inputs']['sex']))]
     if report.get('illustrative_score') is not None:
         rows += [('Illustrative output', f"{report['illustrative_score']:.1f}/100")]
+    else:
+        rows += [('Illustrative probability', 'not enabled')]
     for label,val in rows:
         c.setFillColor(blue); c.setFont('Helvetica-Bold',9.5); c.drawString(42,y,label)
         c.setFillColor(grey); c.setFont('Helvetica',9.5); c.drawString(200,y,str(val)); y -= 20
@@ -317,6 +330,12 @@ SVG_PEOPLE = """<svg viewBox='0 0 64 64' fill='currentColor'><circle cx='32' cy=
 SVG_ARROW = """<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h13M14 7l5 5-5 5'/></svg>"""
 SVG_MEGAPHONE = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M11 29v9h9l23 10V19L20 29h-9Z'/><path d='M20 38 24 53h8l-5-12M49 24l6-5M50 34h8M49 44l6 5'/></svg>"""
 
+def invalidate_amber_calculation():
+    """Mark any previously displayed calculation stale whenever a Calculator input changes."""
+    st.session_state.amber_result = None
+    st.session_state.amber_report = None
+
+
 pages = ["Home","AMBER Calculator","DNA Compass / Method","Model & Validation","About AMBER"]
 page = st.segmented_control("Navigation", pages, default="Home", label_visibility="collapsed") or "Home"
 
@@ -355,6 +374,67 @@ if page == "Home":
     ''', unsafe_allow_html=True)
 
 elif page == "AMBER Calculator":
+    # Final locked Calculator state. Model selection is intentionally outside any form so
+    # AMBER-C demographics reveal immediately while calculation still requires the button.
+    current_model = st.session_state.get("amber_model_config", "AMBER-B (biomarker-only)")
+    panel_h = 574 if str(current_model).startswith("AMBER-B") else 664
+    st.markdown(f"""
+    <style>
+    /* PAGE 2 FINAL LOCK PATCH — scoped to Calculator keyed containers only */
+    .st-key-amber_input_panel,.st-key-amber_results_panel,.st-key-amber_scientific_panel{{height:{panel_h}px!important;min-height:{panel_h}px!important;}}
+
+    /* No nested visual form/card. All controls sit directly in the Input outer panel. */
+    .st-key-amber_input_panel div[data-testid="stForm"],
+    .st-key-amber_input_panel [data-testid="stForm"]{{border:none!important;background:transparent!important;box-shadow:none!important;padding:0!important;}}
+
+    /* Select controls are closed-list selectors, not free-entry fields. */
+    .st-key-amber_input_panel div[data-baseweb="select"] input{{caret-color:transparent!important;cursor:pointer!important;user-select:none!important;}}
+    .st-key-amber_input_panel div[data-baseweb="select"] > div{{cursor:pointer!important;}}
+    .st-key-amber_input_panel [data-testid="stTooltipIcon"]{{color:#0B59B0!important;}}
+
+    .calc-demographics-title{{color:#06285F;font-size:18px;font-weight:850;margin:7px 0 3px;}}
+
+    /* Native button replaces form submit but retains locked calculator-button styling. */
+    .st-key-amber_input_panel .stButton button{{width:100%!important;height:47px!important;min-height:47px!important;margin-top:5px!important;border-radius:8px!important;background:linear-gradient(90deg,#073477,#0A4B98)!important;color:#fff!important;font-size:13px!important;font-weight:800!important;letter-spacing:.1px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:11px!important;}}
+    .st-key-amber_input_panel .stButton button:before{{content:"";width:18px;height:18px;display:inline-block;background-size:18px 18px;background-repeat:no-repeat;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='2' width='14' height='20' rx='2'/%3E%3Cpath d='M8 6h8v4H8zM8 14h2M12 14h2M16 14h0M8 18h2M12 18h2M16 18h0'/%3E%3C/svg%3E");}}
+
+    /* Final gauge micro-corrections. */
+    .locked-gauge{{height:224px!important;margin:0!important;}}
+    .locked-gauge svg{{height:201px!important;width:110%!important;margin-left:-5%!important;}}
+    .locked-gauge .g50{{top:0!important;}}
+    .locked-gauge .g0{{left:17px!important;bottom:41px!important;}}
+    .locked-gauge .g100{{right:16px!important;bottom:41px!important;}}
+    .locked-gauge-score{{top:83px!important;}}
+    .locked-gauge-score .main{{font-size:52px!important;}}
+    .locked-gauge-score .den{{margin-top:5px!important;}}
+    .locked-gauge-score.inactive{{top:91px!important;}}
+    .locked-gauge-score.inactive .main{{font-size:54px!important;color:#8093AA!important;}}
+    .locked-gauge-score .off{{font-size:13px;color:#7187A3;margin-top:8px;white-space:nowrap;}}
+    .locked-gauge-caption{{bottom:1px!important;}}
+    .locked-gauge-caption.inactive{{line-height:1.35!important;bottom:-3px!important;font-size:11.5px!important;}}
+
+    .calc-metric{{height:82px!important;}}
+    .calc-warning-icon,.calc-warning-icon svg{{width:34px!important;height:34px!important;}}
+    .calc-demo-alert{{margin-top:10px!important;}}
+    .st-key-amber_results_panel .stDownloadButton{{margin-top:13px!important;}}
+    .st-key-amber_results_panel .stDownloadButton button{{height:49px!important;min-height:49px!important;}}
+    .st-key-amber_results_panel .stDownloadButton button:before{{width:21px!important;height:21px!important;background-size:21px 21px!important;}}
+
+    /* Better vertical use of the locked equal-height Results and Scientific panels. */
+    .st-key-amber_results_panel > div[data-testid="stVerticalBlock"],
+    .st-key-amber_scientific_panel > div[data-testid="stVerticalBlock"]{{height:100%!important;}}
+    .calc-science-intro{{font-size:13px!important;line-height:1.48!important;}}
+    .st-key-amber_scientific_panel [data-testid="stLatex"]:nth-of-type(-n+2) .katex{{font-size:1.16em!important;}}
+    .calc-bulb,.calc-bulb svg{{width:32px!important;height:32px!important;}}
+
+    /* Bottom workflow micro-strengthening only. */
+    .calc-workflow-sep{{background:#ADC9E3!important;}}
+    .calc-work-icon{{width:44px!important;height:44px!important;}}
+    .calc-work-icon svg{{width:39px!important;height:39px!important;}}
+    .footer{{margin-top:0!important;padding-top:6px!important;}}
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown('''
     <div class="calc-page-title-row">
       <div class="calc-page-title-left">
@@ -373,44 +453,96 @@ elif page == "AMBER Calculator":
     with c1:
         with st.container(border=False, key="amber_input_panel"):
             st.markdown('''<div class="calc-panel-head"><div class="calc-panel-num">1</div><div><div class="calc-panel-title">Input values</div><div class="calc-panel-sub">Enter biomarker values and, for AMBER-C, demographic variables.</div></div></div>''', unsafe_allow_html=True)
-            with st.form("amber_form_locked"):
-                st.markdown('<div class="calc-section-label">Model configuration</div>', unsafe_allow_html=True)
-                model_name = st.selectbox("Model configuration", ["AMBER-B (biomarker-only)", "AMBER-C (biomarker + age/sex)"], label_visibility="collapsed")
-                amber_b = model_name.startswith("AMBER-B")
-                if not amber_b:
-                    age = st.number_input("Age (years)", 18, 100, 68)
-                    sex = st.radio("Sex", ["Male", "Female"], horizontal=True, index=1)
-                else:
-                    age = 68; sex = "Female"
-                st.markdown('<div class="calc-biomarker-title">Biomarker measurements</div>', unsafe_allow_html=True)
-                ab40 = st.number_input("Plasma Aβ40 concentration (pg/mL)", min_value=.01, value=285.0, step=1.0, format="%.2f")
-                ab42 = st.number_input("Plasma Aβ42 concentration (pg/mL)", min_value=.01, value=18.5, step=.1, format="%.2f")
-                demo = st.checkbox("Use illustrative demo probability", value=False, help="Uses placeholder coefficients only to demonstrate the software workflow.")
-                submitted = st.form_submit_button("CALCULATE AMBER SCORE", use_container_width=True)
+            st.markdown('<div class="calc-section-label">Model configuration</div>', unsafe_allow_html=True)
+            model_name = st.selectbox(
+                "Model configuration",
+                ["AMBER-B (biomarker-only)", "AMBER-C (biomarker + age/sex)"],
+                key="amber_model_config",
+                label_visibility="collapsed",
+                accept_new_options=False,
+                on_change=invalidate_amber_calculation,
+            )
+            amber_b = model_name.startswith("AMBER-B")
+
+            if not amber_b:
+                st.markdown('<div class="calc-demographics-title">Demographics</div>', unsafe_allow_html=True)
+                age = st.number_input(
+                    "Age (years)", min_value=18, max_value=100, value=68, step=1,
+                    key="amber_age", on_change=invalidate_amber_calculation
+                )
+                sex = st.selectbox(
+                    "Sex", ["Male", "Female"], index=1, key="amber_sex",
+                    accept_new_options=False, on_change=invalidate_amber_calculation
+                )
+            else:
+                age = 68
+                sex = "Female"
+
+            st.markdown('<div class="calc-biomarker-title">Biomarker measurements</div>', unsafe_allow_html=True)
+            ab40 = st.number_input(
+                "Plasma Aβ40 concentration (pg/mL)", min_value=.01, value=285.0,
+                step=1.0, format="%.2f", key="amber_ab40", on_change=invalidate_amber_calculation
+            )
+            ab42 = st.number_input(
+                "Plasma Aβ42 concentration (pg/mL)", min_value=.01, value=18.5,
+                step=.1, format="%.2f", key="amber_ab42", on_change=invalidate_amber_calculation
+            )
+            demo = st.checkbox(
+                "Use illustrative demo probability", value=False, key="amber_demo_probability",
+                help="Displays an illustrative AMBER probability using placeholder coefficients for interface demonstration only. This is not a clinically validated output.",
+                on_change=invalidate_amber_calculation,
+            )
+            submitted = st.button("CALCULATE AMBER SCORE", use_container_width=True, key="amber_calculate_button")
+
             st.markdown(f'''<div class="calc-info-callout"><div class="calc-info-icon">{SVG_CALC_INFO}</div><div>The calculation is performed only after you click<br><b>“Calculate AMBER Score”.</b></div></div>''', unsafe_allow_html=True)
+
             if submitted:
-                ratio, R, M = derive(ab40, ab42); score = None
-                if demo: ratio, R, M, score = demo_predict(model_name, ab40, ab42, age, sex)
-                st.session_state.amber_result = {"model": model_name, "ratio": ratio, "R": R, "M": M, "score": score, "demo": demo}
-                st.session_state.amber_report = {"application":APP_VERSION,"generated_at":datetime.now().isoformat(timespec="minutes"),"configuration":model_name,"inputs":{"ab40_pg_ml":ab40,"ab42_pg_ml":ab42,"age":None if amber_b else age,"sex":None if amber_b else sex},"derived":{"ratio":ratio,"R":R,"M":M},"illustrative_score":score,"status":"DEMONSTRATION ONLY" if demo else "DERIVED FEATURES ONLY"}
+                ratio, R, M = derive(ab40, ab42)
+                score = None
+                if demo:
+                    ratio, R, M, score = demo_predict(model_name, ab40, ab42, age, sex)
+                st.session_state.amber_result = {
+                    "model": model_name, "ratio": ratio, "R": R, "M": M,
+                    "score": score, "demo": bool(demo)
+                }
+                st.session_state.amber_report = {
+                    "application": APP_VERSION,
+                    "generated_at": datetime.now().isoformat(timespec="minutes"),
+                    "configuration": model_name,
+                    "inputs": {
+                        "ab40_pg_ml": ab40, "ab42_pg_ml": ab42,
+                        "age": None if amber_b else age,
+                        "sex": None if amber_b else sex,
+                    },
+                    "derived": {"ratio": ratio, "R": R, "M": M},
+                    "illustrative_score": score,
+                    "status": "DEMONSTRATION ONLY" if demo else "DERIVED FEATURES ONLY",
+                }
 
     with c2:
         with st.container(border=False, key="amber_results_panel"):
             st.markdown('''<div class="calc-panel-head"><div class="calc-panel-num">2</div><div><div class="calc-panel-title">Results</div><div class="calc-panel-sub">Illustrative output based on the current inputs.</div></div></div>''', unsafe_allow_html=True)
             r = st.session_state.amber_result
             if r is None:
-                st.markdown('''<div style="height:405px;display:flex;align-items:center;justify-content:center;text-align:center;color:#6A7F97;font-size:13px;line-height:1.5"><div>Enter values in the Input panel and click<br><b style="color:#06285F">CALCULATE AMBER SCORE</b>.</div></div>''', unsafe_allow_html=True)
+                st.markdown('''<div style="height:430px;display:flex;align-items:center;justify-content:center;text-align:center;color:#6A7F97;font-size:13px;line-height:1.5"><div>Enter values in the Input panel and click<br><b style="color:#06285F">CALCULATE AMBER SCORE</b>.</div></div>''', unsafe_allow_html=True)
             else:
-                if r["score"] is not None:
-                    st.markdown(segmented_gauge_html(r["score"]), unsafe_allow_html=True)
+                if r["demo"] and r["score"] is not None:
+                    st.markdown(segmented_gauge_html(r["score"], active=True), unsafe_allow_html=True)
                 else:
-                    st.markdown('''<div style="height:208px;display:flex;align-items:center;justify-content:center;text-align:center;color:#6A7F97;font-size:13px;line-height:1.5"><div><b style="color:#06285F">Derived biomarker features calculated.</b><br>No validated probability model is loaded.</div></div>''', unsafe_allow_html=True)
+                    st.markdown(segmented_gauge_html(None, active=False), unsafe_allow_html=True)
+
                 st.markdown(f'''<div class="calc-metrics"><div class="calc-metric"><div class="calc-metric-label">Aβ42/Aβ40</div><div class="calc-metric-value">{r["ratio"]:.4f}</div></div><div class="calc-metric"><div class="calc-metric-label">R</div><div class="calc-metric-value">{r["R"]:.3f}</div></div><div class="calc-metric"><div class="calc-metric-label">M</div><div class="calc-metric-value">{r["M"]:.3f}</div></div></div>''', unsafe_allow_html=True)
+
                 if r["demo"]:
                     st.markdown(f'''<div class="calc-demo-alert"><div class="calc-warning-icon">{SVG_WARNING_TRI}</div><div><div class="calc-demo-title">DEMONSTRATION OUTPUT ONLY.</div><div class="calc-demo-copy">Placeholder coefficients are used only to demonstrate the interface. This is not a clinically validated AMBER result.</div></div></div>''', unsafe_allow_html=True)
+
                 if st.session_state.amber_report is not None:
                     pdf_bytes = build_amber_pdf(st.session_state.amber_report)
-                    st.download_button("Download results summary (PDF)", data=pdf_bytes, file_name="AMBER_V01_results_summary.pdf", mime="application/pdf", use_container_width=True, key="amber_pdf_download")
+                    st.download_button(
+                        "Download results summary (PDF)", data=pdf_bytes,
+                        file_name="AMBER_V01_results_summary.pdf", mime="application/pdf",
+                        use_container_width=True, key="amber_pdf_download"
+                    )
 
     with c3:
         with st.container(border=False, key="amber_scientific_panel"):
@@ -426,7 +558,6 @@ elif page == "AMBER Calculator":
             st.markdown(f'''<div class="calc-safeguard"><div class="calc-bulb">{SVG_BULB}</div><div><b>Scientific safeguard:</b> no final β coefficients, clinical thresholds, AUC, sensitivity, specificity, or model-lock date are shown until they are empirically derived and validated.</div></div>''', unsafe_allow_html=True)
 
     st.markdown(f'''<div class="calc-workflow"><div class="calc-workflow-intro"><div class="calc-workflow-title">What happens after you click Calculate?</div><div class="calc-workflow-sub">From input to AMBER score in four steps.</div></div><div class="calc-workflow-sep"></div><div class="calc-workflow-steps"><div class="calc-work-step"><div class="calc-work-num">1</div><div class="calc-work-icon">{SVG_CLIPBOARD}</div><div><div class="calc-work-title">Read inputs</div><div class="calc-work-copy">Get biomarker (and<br>demographic) values.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">2</div><div class="calc-work-icon">{SVG_GEAR}</div><div><div class="calc-work-title">Derive features</div><div class="calc-work-copy">Compute ratio (R)<br>and geometric mean (M).</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">3</div><div class="calc-work-icon">{SVG_CHART}</div><div><div class="calc-work-title">Apply model</div><div class="calc-work-copy">Calculate I and convert<br>to probability.</div></div></div><div class="calc-work-arrow">{SVG_ARROW}</div><div class="calc-work-step"><div class="calc-work-num">4</div><div class="calc-work-icon">{SVG_REPORT}</div><div><div class="calc-work-title">Report</div><div class="calc-work-copy">Display score and<br>summary outputs.</div></div></div></div></div>''', unsafe_allow_html=True)
-    st.markdown('<style>.footer{height:28px!important;margin-top:0!important;padding-top:8px!important}</style>', unsafe_allow_html=True)
 
 elif page == "DNA Compass / Method":
     st.markdown('<div class="kicker">Nanotechnology layer</div><div class="page-title">Integrated molecular workflow</div><div class="page-sub">From blood-derived sample to a PET-informed estimate of cerebral amyloid positivity.</div>', unsafe_allow_html=True)
