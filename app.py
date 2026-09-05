@@ -351,6 +351,22 @@ SVG_BRAIN_AMBER = """<svg viewBox='0 0 72 72' fill='none' stroke-linecap='round'
 </svg>"""
 SVG_BAR_CHART = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'><path d='M10 52h44'/><rect x='15' y='34' width='8' height='14' rx='1' fill='currentColor' stroke='none'/><rect x='28' y='25' width='8' height='23' rx='1' fill='currentColor' stroke='none'/><rect x='41' y='14' width='8' height='34' rx='1' fill='currentColor' stroke='none'/></svg>"""
 
+SVG_ROC = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+<path d='M10 52h44M10 52V12'/><path d='M14 46c8-1 12-12 18-16 7-5 11-3 17-14' stroke-width='4'/><circle cx='20' cy='39' r='2.6' fill='currentColor' stroke='none'/><circle cx='32' cy='30' r='2.6' fill='currentColor' stroke='none'/><circle cx='48' cy='16' r='2.6' fill='currentColor' stroke='none'/>
+</svg>"""
+SVG_TARGET = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'>
+<circle cx='32' cy='32' r='20'/><circle cx='32' cy='32' r='11'/><circle cx='32' cy='32' r='3' fill='currentColor' stroke='none'/><path d='M32 6v10M32 48v10M6 32h10M48 32h10'/>
+</svg>"""
+SVG_TABLE = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linejoin='round'>
+<rect x='10' y='12' width='44' height='40' rx='3'/><path d='M10 24h44M10 36h44M10 44h44M26 12v40'/>
+</svg>"""
+SVG_LOCK = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'>
+<rect x='15' y='29' width='34' height='25' rx='4'/><path d='M22 29v-8c0-7 4-12 10-12s10 5 10 12v8'/><circle cx='32' cy='41' r='3' fill='currentColor' stroke='none'/><path d='M32 44v5'/>
+</svg>"""
+SVG_EMPTY_BARS = """<svg viewBox='0 0 64 64' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'>
+<path d='M10 52h44'/><rect x='16' y='36' width='8' height='12' rx='1' fill='currentColor' stroke='none'/><rect x='28' y='27' width='8' height='21' rx='1' fill='currentColor' stroke='none'/><rect x='40' y='18' width='8' height='30' rx='1' fill='currentColor' stroke='none'/>
+</svg>"""
+
 def invalidate_amber_calculation():
     """Mark any previously displayed calculation stale whenever a Calculator input changes."""
     st.session_state.amber_result = None
@@ -911,35 +927,543 @@ elif page == "DNA Compass / Method":
     """)
 
 elif page == "Model & Validation":
-    st.markdown('<div class="kicker">Evidence framework</div><div class="page-title">Future validation dashboard</div><div class="page-sub">Real dashboard components are shown in an empty state until PET-linked validation data are available.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="notice"><b>📣 No performance metrics are claimed in V0.1.</b> The panels below are placeholders for future real-data outputs.</div>', unsafe_allow_html=True)
-    v1,v2,v3 = st.columns(3,gap="large")
-    with v1:
-        st.markdown('<div class="validation-card"><div class="val-title"><div class="val-icon">📈</div>ROC / AUROC</div><div class="val-sub">Discrimination ability to identify cerebral amyloid positivity.</div>', unsafe_allow_html=True)
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[0,1], y=[0,1], mode="lines", line=dict(dash="dash",color="#8FB1D6"), showlegend=False))
-        fig.update_layout(height=320,margin=dict(l=45,r=20,t=20,b=45),paper_bgcolor="white",plot_bgcolor="#FBFDFF",xaxis_title="1 − Specificity",yaxis_title="Sensitivity",xaxis=dict(range=[0,1]),yaxis=dict(range=[0,1]),annotations=[dict(x=.5,y=.58,xref="paper",yref="paper",text="<b>Awaiting PET-linked hospital data</b><br>No AUROC is calculated in V0.1",showarrow=False,font=dict(color="#6A7C90",size=13))])
-        st.plotly_chart(fig,use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    with v2:
-        st.markdown('<div class="validation-card"><div class="val-title"><div class="val-icon">🎯</div>Calibration</div><div class="val-sub">Agreement between predicted and observed probability.</div>', unsafe_allow_html=True)
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=[0,1], y=[0,1], mode="lines", line=dict(dash="dash",color="#8FB1D6"), showlegend=False))
-        fig.update_layout(height=320,margin=dict(l=45,r=20,t=20,b=45),paper_bgcolor="white",plot_bgcolor="#FBFDFF",xaxis_title="Predicted probability",yaxis_title="Observed probability",xaxis=dict(range=[0,1]),yaxis=dict(range=[0,1]),annotations=[dict(x=.5,y=.58,xref="paper",yref="paper",text="<b>Awaiting model derivation</b><br>Intercept · slope · plot · Brier score",showarrow=False,font=dict(color="#6A7C90",size=13))])
-        st.plotly_chart(fig,use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    with v3:
-        st.markdown('<div class="validation-card"><div class="val-title"><div class="val-icon">📊</div>Decision-curve analysis</div><div class="val-sub">Clinical net benefit across threshold probabilities.</div>', unsafe_allow_html=True)
-        fig = go.Figure()
-        fig.add_hline(y=0,line_dash="dash",line_color="#8FB1D6")
-        fig.update_layout(height=320,margin=dict(l=45,r=20,t=20,b=45),paper_bgcolor="white",plot_bgcolor="#FBFDFF",xaxis_title="Threshold probability",yaxis_title="Net benefit",xaxis=dict(range=[0,1]),yaxis=dict(range=[-.1,.4]),annotations=[dict(x=.5,y=.58,xref="paper",yref="paper",text="<b>Awaiting prespecified operating thresholds</b><br>No net-benefit curve is calculated in V0.1",showarrow=False,font=dict(color="#6A7C90",size=13))])
-        st.plotly_chart(fig,use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Prespecified model comparison</div>', unsafe_allow_html=True)
-    df = pd.DataFrame([["Aβ40 alone","Single-biomarker comparator"],["Aβ42 alone","Single-biomarker comparator"],["Aβ42/Aβ40 ratio","Conventional ratio comparator"],["AMBER-B (R + M)","Primary joint biomarker model"],["AMBER-C (R + M + age + sex)","Clinical extension if incremental value is reproducible"],["p-tau217","Optional contemporary comparator"],["p-tau217/Aβ42","Optional comparator"]],columns=["Model / biomarker","Purpose"])
-    st.dataframe(df,hide_index=True,use_container_width=True)
-    st.write("")
-    st.markdown('<div class="soft"><b style="color:#0B3D8A">🔒 Model-lock principle:</b> preprocessing, coefficients, calibration and operating thresholds must be frozen before independent external validation. Any later recalibration becomes a new model version.</div>', unsafe_allow_html=True)
+    def _render_validation_html(raw_html):
+        # Prevent Markdown from interpreting indented HTML as code blocks.
+        normalized = []
+        for line in raw_html.splitlines():
+            normalized.append(line[4:] if line.startswith("    ") else line)
+        st.markdown("\n".join(normalized), unsafe_allow_html=True)
+
+    st.markdown("""
+    <style>
+    /* ==========================================================
+       PAGE 4 — MODEL & VALIDATION LOCKED VISUAL MATCH
+       Scoped to this page. Shared hero/nav remain untouched.
+       ========================================================== */
+    .validation-title-row{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 510px;
+        align-items:center;
+        column-gap:30px;
+        min-height:104px;
+        margin:0 0 12px 0;
+    }
+    .validation-title-left{align-self:center;}
+    .validation-kicker{
+        color:#0B4EA1;
+        font-size:12px;
+        line-height:1;
+        font-weight:850;
+        text-transform:uppercase;
+        letter-spacing:1.5px;
+        margin:0 0 11px 0;
+    }
+    .validation-title{
+        color:#06285F;
+        font-size:37px;
+        line-height:1.05;
+        font-weight:850;
+        letter-spacing:-.8px;
+        margin:0 0 7px 0;
+    }
+    .validation-sub{
+        color:#617892;
+        font-size:16px;
+        line-height:1.3;
+        margin:0;
+    }
+    .validation-brand-message{text-align:right;align-self:center;padding-top:7px;}
+    .validation-brand-main{
+        color:#0B4EA1;
+        font-size:13px;
+        letter-spacing:5px;
+        font-weight:500;
+        white-space:nowrap;
+    }
+    .validation-brand-sub{
+        color:#5D79A3;
+        font-size:10.5px;
+        letter-spacing:1.4px;
+        margin-top:25px;
+        white-space:nowrap;
+    }
+    .validation-brand-ai{
+        position:relative;
+        display:inline-block;
+        padding:0 6px;
+    }
+    .validation-brand-ai:after{
+        content:"";
+        position:absolute;
+        left:3px;
+        right:3px;
+        bottom:-13px;
+        height:2px;
+        background:#F4B42D;
+    }
+
+    .validation-notice{
+        height:48px;
+        box-sizing:border-box;
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:0 17px;
+        border:1px solid #E8BD55;
+        border-radius:12px;
+        background:#FFF8E6;
+        color:#6D5414;
+        font-size:13px;
+        line-height:1;
+        margin:0 0 13px 0;
+        white-space:nowrap;
+        overflow:hidden;
+    }
+    .validation-notice-icon{
+        width:27px;
+        height:27px;
+        flex:0 0 auto;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#D89400;
+    }
+    .validation-notice-icon svg{width:25px;height:25px;}
+    .validation-notice strong{font-weight:850;}
+
+    .validation-grid{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:24px;
+        align-items:stretch;
+        margin:0 0 13px 0;
+    }
+    .validation-card-locked{
+        height:304px;
+        box-sizing:border-box;
+        border:1px solid #C8DFF5;
+        border-radius:13px;
+        background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
+        padding:15px 16px 13px;
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    }
+    .validation-card-head{
+        display:grid;
+        grid-template-columns:52px 1fr;
+        align-items:center;
+        gap:12px;
+        min-height:58px;
+        margin-bottom:3px;
+    }
+    .validation-card-icon{
+        width:46px;
+        height:46px;
+        border-radius:50%;
+        background:#E8F3FF;
+        color:#1768B2;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .validation-card-icon svg{width:29px;height:29px;}
+    .validation-card-title{
+        color:#06285F;
+        font-size:16px;
+        font-weight:850;
+        line-height:1.15;
+        margin-bottom:5px;
+    }
+    .validation-card-sub{
+        color:#526D8E;
+        font-size:12.7px;
+        line-height:1.3;
+    }
+    .validation-chart{
+        flex:1;
+        min-height:0;
+        position:relative;
+        margin-top:2px;
+    }
+    .validation-chart svg{
+        width:100%;
+        height:100%;
+        display:block;
+    }
+    .validation-empty{
+        position:absolute;
+        left:50%;
+        top:49%;
+        transform:translate(-50%,-50%);
+        width:82%;
+        text-align:center;
+        pointer-events:none;
+    }
+    .validation-empty-icon{
+        width:58px;
+        height:58px;
+        border-radius:50%;
+        background:#E2F0FF;
+        color:#1768B2;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        margin:0 auto 9px;
+    }
+    .validation-empty-icon svg{width:34px;height:34px;}
+    .validation-empty-title{
+        color:#0A3D86;
+        font-size:13.5px;
+        font-weight:850;
+        line-height:1.2;
+        margin-bottom:4px;
+    }
+    .validation-empty-sub{
+        color:#5E78A0;
+        font-size:11.5px;
+        line-height:1.2;
+    }
+    .vaxis-label{
+        font-size:10.5px;
+        fill:#5C77A0;
+    }
+    .vtick{
+        font-size:9.5px;
+        fill:#6B83A3;
+    }
+    .vgrid{
+        stroke:#E5EEF8;
+        stroke-width:1;
+    }
+    .vaxis{
+        stroke:#92B3D6;
+        stroke-width:1.1;
+    }
+    .vref{
+        stroke:#8FB6E2;
+        stroke-width:1.4;
+        stroke-dasharray:6 6;
+    }
+
+    .comparison-card{
+        box-sizing:border-box;
+        border:1px solid #C8DFF5;
+        border-radius:13px;
+        background:linear-gradient(180deg,#FFFFFF 0%,#FCFEFF 100%);
+        padding:12px 16px 14px;
+        margin:0 0 12px 0;
+    }
+    .comparison-head{
+        display:grid;
+        grid-template-columns:52px 1fr;
+        align-items:center;
+        gap:12px;
+        margin-bottom:10px;
+    }
+    .comparison-icon{
+        width:46px;
+        height:46px;
+        border-radius:50%;
+        background:#E8F3FF;
+        color:#1768B2;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .comparison-icon svg{width:29px;height:29px;}
+    .comparison-title{
+        color:#06285F;
+        font-size:16px;
+        font-weight:850;
+        margin-bottom:4px;
+    }
+    .comparison-sub{
+        color:#526D8E;
+        font-size:12.8px;
+        line-height:1.3;
+    }
+    .comparison-table-wrap{
+        overflow:hidden;
+        border:1px solid #D9E7F5;
+        border-radius:8px;
+    }
+    .comparison-table{
+        width:100%;
+        border-collapse:collapse;
+        table-layout:fixed;
+        font-size:12px;
+    }
+    .comparison-table th{
+        background:#EEF5FC;
+        color:#06285F;
+        text-align:left;
+        font-weight:850;
+        padding:7px 11px;
+        border-bottom:1px solid #D5E4F3;
+    }
+    .comparison-table th:first-child{width:34%;}
+    .comparison-table td{
+        padding:6px 11px;
+        border-bottom:1px solid #E4EDF7;
+        color:#526D8E;
+        vertical-align:middle;
+        line-height:1.2;
+    }
+    .comparison-table tr:last-child td{border-bottom:none;}
+    .comparison-table td:first-child{
+        color:#06285F;
+        font-weight:750;
+        border-right:1px solid #E4EDF7;
+    }
+
+    .model-lock{
+        min-height:64px;
+        box-sizing:border-box;
+        border:1px solid #B8D8F6;
+        border-radius:12px;
+        background:linear-gradient(90deg,#EEF7FF 0%,#E7F2FD 100%);
+        display:grid;
+        grid-template-columns:62px 1fr;
+        align-items:center;
+        gap:10px;
+        padding:8px 16px 8px 12px;
+        margin:0 0 12px 0;
+    }
+    .model-lock-icon{
+        width:48px;
+        height:48px;
+        border-radius:50%;
+        background:linear-gradient(180deg,#2C65AA,#0A438D);
+        color:#fff;
+        border:4px solid #D9EAFE;
+        box-shadow:0 0 0 1px #8BB7E7;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .model-lock-icon svg{width:27px;height:27px;}
+    .model-lock-copy{
+        color:#315C91;
+        font-size:12.7px;
+        line-height:1.35;
+    }
+    .model-lock-copy strong{color:#0B3D8A;font-weight:850;}
+
+    .footer.validation-footer{
+        height:47px;
+        box-sizing:border-box;
+        border-top:1px solid #CFE0F2;
+        margin-top:0!important;
+        padding-top:12px!important;
+        font-size:10.5px!important;
+        color:#68809A;
+        display:grid!important;
+        grid-template-columns:1fr 1fr 1fr;
+        align-items:start;
+    }
+    .footer.validation-footer>div:nth-child(1){text-align:left}
+    .footer.validation-footer>div:nth-child(2){text-align:center}
+    .footer.validation-footer>div:nth-child(3){text-align:right}
+
+    @media(max-width:1100px){
+        .validation-title-row{grid-template-columns:1fr;min-height:auto;}
+        .validation-brand-message{display:none}
+        .validation-grid{grid-template-columns:1fr;gap:12px}
+        .validation-card-locked{height:310px}
+        .validation-notice{height:auto;min-height:48px;white-space:normal;line-height:1.35;padding-top:9px;padding-bottom:9px}
+    }
+    @media(max-width:760px){
+        .validation-title{font-size:29px}
+        .validation-sub{font-size:14px}
+        .comparison-table{font-size:11px}
+        .comparison-table th,.comparison-table td{padding:6px 7px}
+        .model-lock{grid-template-columns:52px 1fr}
+        .footer.validation-footer{height:auto;grid-template-columns:1fr;gap:4px}
+        .footer.validation-footer>div{text-align:left!important}
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Shared-looking title row.
+    _render_validation_html(f"""
+    <div class="validation-title-row">
+      <div class="validation-title-left">
+        <div class="validation-kicker">EVIDENCE FRAMEWORK</div>
+        <div class="validation-title">Future validation dashboard</div>
+        <div class="validation-sub">From blood-based molecular measurement to a future estimate of cerebral amyloid positivity.</div>
+      </div>
+      <div class="validation-brand-message">
+        <div class="validation-brand-main">BLOOD&nbsp;&nbsp;×&nbsp;&nbsp;<span class="validation-brand-ai">AI</span>&nbsp;&nbsp;×&nbsp;&nbsp;BRAIN HEALTH</div>
+        <div class="validation-brand-sub">TRANSPARENT · REPRODUCIBLE · FOR A BRIGHTER TOMORROW</div>
+      </div>
+    </div>
+
+    <div class="validation-notice">
+      <div class="validation-notice-icon">{SVG_MEGAPHONE}</div>
+      <div><strong>No performance metrics are claimed in V0.1.</strong> These are real dashboard components in an empty state, ready to receive future PET-linked validation outputs.</div>
+    </div>
+    """)
+
+    # Chart SVG fragments kept deliberately empty / non-claiming.
+    roc_chart = """
+    <svg viewBox='0 0 360 210' aria-label='Empty ROC chart'>
+      <g>
+        <line class='vgrid' x1='48' y1='165' x2='332' y2='165'/><line class='vgrid' x1='48' y1='133' x2='332' y2='133'/>
+        <line class='vgrid' x1='48' y1='101' x2='332' y2='101'/><line class='vgrid' x1='48' y1='69' x2='332' y2='69'/>
+        <line class='vgrid' x1='48' y1='37' x2='332' y2='37'/>
+        <line class='vgrid' x1='105' y1='26' x2='105' y2='165'/><line class='vgrid' x1='162' y1='26' x2='162' y2='165'/>
+        <line class='vgrid' x1='219' y1='26' x2='219' y2='165'/><line class='vgrid' x1='276' y1='26' x2='276' y2='165'/>
+        <line class='vaxis' x1='48' y1='165' x2='332' y2='165'/><line class='vaxis' x1='48' y1='26' x2='48' y2='165'/>
+        <line class='vref' x1='48' y1='165' x2='332' y2='26'/>
+        <text class='vtick' x='43' y='169' text-anchor='end'>0.0</text><text class='vtick' x='43' y='137' text-anchor='end'>0.2</text>
+        <text class='vtick' x='43' y='105' text-anchor='end'>0.4</text><text class='vtick' x='43' y='73' text-anchor='end'>0.6</text>
+        <text class='vtick' x='43' y='41' text-anchor='end'>0.8</text><text class='vtick' x='43' y='29' text-anchor='end'>1.0</text>
+        <text class='vtick' x='48' y='180' text-anchor='middle'>0.0</text><text class='vtick' x='105' y='180' text-anchor='middle'>0.2</text>
+        <text class='vtick' x='162' y='180' text-anchor='middle'>0.4</text><text class='vtick' x='219' y='180' text-anchor='middle'>0.6</text>
+        <text class='vtick' x='276' y='180' text-anchor='middle'>0.8</text><text class='vtick' x='332' y='180' text-anchor='middle'>1.0</text>
+        <text class='vaxis-label' x='190' y='202' text-anchor='middle'>1 - Specificity</text>
+        <text class='vaxis-label' x='14' y='100' text-anchor='middle' transform='rotate(-90 14 100)'>Sensitivity</text>
+      </g>
+    </svg>
+    """
+
+    calibration_chart = """
+    <svg viewBox='0 0 360 210' aria-label='Empty calibration chart'>
+      <g>
+        <line class='vgrid' x1='48' y1='165' x2='332' y2='165'/><line class='vgrid' x1='48' y1='133' x2='332' y2='133'/>
+        <line class='vgrid' x1='48' y1='101' x2='332' y2='101'/><line class='vgrid' x1='48' y1='69' x2='332' y2='69'/>
+        <line class='vgrid' x1='48' y1='37' x2='332' y2='37'/>
+        <line class='vgrid' x1='105' y1='26' x2='105' y2='165'/><line class='vgrid' x1='162' y1='26' x2='162' y2='165'/>
+        <line class='vgrid' x1='219' y1='26' x2='219' y2='165'/><line class='vgrid' x1='276' y1='26' x2='276' y2='165'/>
+        <line class='vaxis' x1='48' y1='165' x2='332' y2='165'/><line class='vaxis' x1='48' y1='26' x2='48' y2='165'/>
+        <line class='vref' x1='48' y1='165' x2='332' y2='26'/>
+        <text class='vtick' x='43' y='169' text-anchor='end'>0.0</text><text class='vtick' x='43' y='137' text-anchor='end'>0.2</text>
+        <text class='vtick' x='43' y='105' text-anchor='end'>0.4</text><text class='vtick' x='43' y='73' text-anchor='end'>0.6</text>
+        <text class='vtick' x='43' y='41' text-anchor='end'>0.8</text><text class='vtick' x='43' y='29' text-anchor='end'>1.0</text>
+        <text class='vtick' x='48' y='180' text-anchor='middle'>0.0</text><text class='vtick' x='105' y='180' text-anchor='middle'>0.2</text>
+        <text class='vtick' x='162' y='180' text-anchor='middle'>0.4</text><text class='vtick' x='219' y='180' text-anchor='middle'>0.6</text>
+        <text class='vtick' x='276' y='180' text-anchor='middle'>0.8</text><text class='vtick' x='332' y='180' text-anchor='middle'>1.0</text>
+        <text class='vaxis-label' x='190' y='202' text-anchor='middle'>Predicted probability</text>
+        <text class='vaxis-label' x='14' y='100' text-anchor='middle' transform='rotate(-90 14 100)'>Observed probability</text>
+      </g>
+    </svg>
+    """
+
+    decision_chart = """
+    <svg viewBox='0 0 360 210' aria-label='Empty decision-curve chart'>
+      <g>
+        <line class='vgrid' x1='48' y1='165' x2='332' y2='165'/><line class='vgrid' x1='48' y1='137' x2='332' y2='137'/>
+        <line class='vgrid' x1='48' y1='109' x2='332' y2='109'/><line class='vgrid' x1='48' y1='81' x2='332' y2='81'/>
+        <line class='vgrid' x1='48' y1='53' x2='332' y2='53'/><line class='vgrid' x1='48' y1='26' x2='332' y2='26'/>
+        <line class='vgrid' x1='105' y1='26' x2='105' y2='165'/><line class='vgrid' x1='162' y1='26' x2='162' y2='165'/>
+        <line class='vgrid' x1='219' y1='26' x2='219' y2='165'/><line class='vgrid' x1='276' y1='26' x2='276' y2='165'/>
+        <line class='vaxis' x1='48' y1='165' x2='332' y2='165'/><line class='vaxis' x1='48' y1='26' x2='48' y2='165'/>
+        <line class='vref' x1='48' y1='137' x2='332' y2='137'/>
+        <text class='vtick' x='43' y='169' text-anchor='end'>-0.1</text><text class='vtick' x='43' y='141' text-anchor='end'>0.0</text>
+        <text class='vtick' x='43' y='113' text-anchor='end'>0.1</text><text class='vtick' x='43' y='85' text-anchor='end'>0.2</text>
+        <text class='vtick' x='43' y='57' text-anchor='end'>0.3</text><text class='vtick' x='43' y='30' text-anchor='end'>0.4</text>
+        <text class='vtick' x='48' y='180' text-anchor='middle'>0.0</text><text class='vtick' x='105' y='180' text-anchor='middle'>0.2</text>
+        <text class='vtick' x='162' y='180' text-anchor='middle'>0.4</text><text class='vtick' x='219' y='180' text-anchor='middle'>0.6</text>
+        <text class='vtick' x='276' y='180' text-anchor='middle'>0.8</text><text class='vtick' x='332' y='180' text-anchor='middle'>1.0</text>
+        <text class='vaxis-label' x='190' y='202' text-anchor='middle'>Threshold probability</text>
+        <text class='vaxis-label' x='14' y='100' text-anchor='middle' transform='rotate(-90 14 100)'>Net benefit</text>
+      </g>
+    </svg>
+    """
+
+    _render_validation_html(f"""
+    <div class="validation-grid">
+      <div class="validation-card-locked">
+        <div class="validation-card-head">
+          <div class="validation-card-icon">{SVG_ROC}</div>
+          <div>
+            <div class="validation-card-title">ROC / AUROC</div>
+            <div class="validation-card-sub">Discrimination ability to identify cerebral amyloid positivity.</div>
+          </div>
+        </div>
+        <div class="validation-chart">
+          {roc_chart}
+          <div class="validation-empty">
+            <div class="validation-empty-icon">{SVG_EMPTY_BARS}</div>
+            <div class="validation-empty-title">Awaiting PET-linked hospital data</div>
+            <div class="validation-empty-sub">No AUROC is calculated in V0.1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="validation-card-locked">
+        <div class="validation-card-head">
+          <div class="validation-card-icon">{SVG_TARGET}</div>
+          <div>
+            <div class="validation-card-title">Calibration</div>
+            <div class="validation-card-sub">Agreement between predicted and observed probability.</div>
+          </div>
+        </div>
+        <div class="validation-chart">
+          {calibration_chart}
+          <div class="validation-empty">
+            <div class="validation-empty-icon">{SVG_EMPTY_BARS}</div>
+            <div class="validation-empty-title">Awaiting model derivation</div>
+            <div class="validation-empty-sub">Intercept · slope · plot · Brier score</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="validation-card-locked">
+        <div class="validation-card-head">
+          <div class="validation-card-icon">{SVG_BAR_CHART}</div>
+          <div>
+            <div class="validation-card-title">Decision-curve analysis</div>
+            <div class="validation-card-sub">Clinical net benefit across threshold probabilities.</div>
+          </div>
+        </div>
+        <div class="validation-chart">
+          {decision_chart}
+          <div class="validation-empty">
+            <div class="validation-empty-icon">{SVG_EMPTY_BARS}</div>
+            <div class="validation-empty-title">Awaiting prespecified operating thresholds</div>
+            <div class="validation-empty-sub">No net-benefit curve is calculated in V0.1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison-card">
+      <div class="comparison-head">
+        <div class="comparison-icon">{SVG_TABLE}</div>
+        <div>
+          <div class="comparison-title">Prespecified model comparison</div>
+          <div class="comparison-sub">Models and biomarkers to be compared in future validation using PET-linked hospital data.</div>
+        </div>
+      </div>
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr><th>Model / biomarker</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Aβ40 alone</td><td>Single-biomarker comparator</td></tr>
+            <tr><td>Aβ42 alone</td><td>Single-biomarker comparator</td></tr>
+            <tr><td>Aβ42/Aβ40 ratio</td><td>Conventional ratio comparator</td></tr>
+            <tr><td>AMBER-B (R + M)</td><td>Primary joint biomarker model</td></tr>
+            <tr><td>AMBER-C (R + M + age + sex)</td><td>Clinical extension if incremental value is reproducible</td></tr>
+            <tr><td>p-tau217</td><td>Optional contemporary comparator</td></tr>
+            <tr><td>p-tau217/Aβ42</td><td>Optional comparator</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="model-lock">
+      <div class="model-lock-icon">{SVG_LOCK}</div>
+      <div class="model-lock-copy">
+        <strong>Model-lock principle:</strong> preprocessing, coefficients, calibration and operating thresholds must be frozen before independent external validation.<br>
+        Any later recalibration becomes a new model version.
+      </div>
+    </div>
+    """)
+
 
 else:
     st.markdown('<div class="kicker">Scientific information</div><div class="page-title">About AMBER</div>', unsafe_allow_html=True)
@@ -959,6 +1483,8 @@ if page == "Home":
     footer_class = "footer home-footer"
 elif page == "DNA Compass / Method":
     footer_class = "footer dna-footer"
+elif page == "Model & Validation":
+    footer_class = "footer validation-footer"
 else:
     footer_class = "footer"
 st.markdown(f'<div class="{footer_class}"><div><b>{APP_VERSION}</b></div><div>Model status: {MODEL_STATUS}</div><div>Research use only · Not a diagnostic test</div></div>', unsafe_allow_html=True)
