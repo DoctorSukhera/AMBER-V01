@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use or reference the AMBER Score Platform, please cite this repository and acknowledge the project team."
+title: "AMBER Score Platform"
+type: software
+version: "0.1"
+date-released: 2026-09-05
+url: "https://github.com/DoctorSukhera/AMBER-V01"
+repository-code: "https://github.com/DoctorSukhera/AMBER-V01"
+authors:
+  - family-names: "ElKassim"
+    given-names: "Fahim"
+  - family-names: "Sukhera"
+    given-names: "Ahmad Yar"
+  - family-names: "Memon"
+    given-names: "Farah Deeba"
+  - family-names: "Ma"
+    given-names: "Xingyi"
+keywords:
+  - amyloid
+  - cerebral amyloid positivity
+  - Alzheimer's disease research
+  - blood biomarkers
+  - Aβ40
+  - Aβ42
+  - DNA nanotechnology
+  - Streamlit
+license: "LicenseRef-AMBER-All-Rights-Reserved"
