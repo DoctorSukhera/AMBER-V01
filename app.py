@@ -248,11 +248,29 @@ def build_amber_pdf(report):
     from reportlab.lib.pagesizes import A4
     from reportlab.pdfgen import canvas
     from reportlab.lib.colors import HexColor
+    from reportlab.lib.utils import ImageReader
     buf = BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
     w,h = A4
     navy = HexColor('#06285F'); blue = HexColor('#0B4EA1'); grey = HexColor('#536B86'); amber = HexColor('#F4B42D')
     c.setFillColor(navy); c.rect(0,h-92,w,92,fill=1,stroke=0)
+
+    # HIT Shenzhen logo in the top-right of the downloaded PDF header.
+    # Uses the same white logo already loaded by the Streamlit app.
+    if LOGO_B64:
+        try:
+            logo_reader = ImageReader(BytesIO(base64.b64decode(LOGO_B64)))
+            c.drawImage(
+                logo_reader,
+                w - 110, h - 84,
+                width=82, height=66,
+                preserveAspectRatio=True,
+                anchor='c',
+                mask='auto'
+            )
+        except Exception:
+            pass
+
     c.setFillColor(amber); c.setFont('Helvetica-Bold',21); c.drawString(42,h-46,'AMBER')
     c.setFillColor(HexColor('#FFFFFF')); c.drawString(138,h-46,'Score Platform')
     c.setFont('Helvetica',9.5); c.drawString(42,h-65,'Research prototype summary - illustrative AMBER output only')
