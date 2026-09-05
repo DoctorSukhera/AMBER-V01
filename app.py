@@ -1862,8 +1862,6 @@ elif page == "About AMBER":
           <div class="about5-lower-title">Development</div>
           <div class="about5-meta-label">Designed and Developed by</div>
           <div class="about5-meta-body">Doctor Sukhera (学睿)</div>
-          <div class="about5-meta-label">Version</div>
-          <div class="about5-meta-body">AMBER V0.1 · Research Prototype</div>
           <div class="about5-meta-label">Co-developer</div>
           <div class="about5-meta-body">Dr. Farah Deeba Memon<br>ABD, SCNU, Guangzhou China</div>
         </div>
