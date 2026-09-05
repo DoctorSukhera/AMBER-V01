@@ -1864,8 +1864,8 @@ elif page == "About AMBER":
           <div class="about5-meta-body">Doctor Sukhera (学睿)</div>
           <div class="about5-meta-label">Version</div>
           <div class="about5-meta-body">AMBER V0.1 · Research Prototype</div>
-          <div class="about5-meta-label">Technology &amp; AI pipeline</div>
-          <div class="about5-meta-body about5-tech">Python + Streamlit research application with custom web UI, algorithmic Aβ40/Aβ42 feature engineering (ratio, R, M), AMBER-B/AMBER-C probabilistic modelling, and an AI/ML-ready PET-linked pipeline for model derivation, calibration, bootstrap validation and external validation.</div>
+          <div class="about5-meta-label">Co-developer</div>
+          <div class="about5-meta-body">Dr. Farah Deeba Memon<br>ABD, SCNU, Guangzhou China</div>
         </div>
       </div>
     </div>
